@@ -1,0 +1,97 @@
+/* ---- reset ---- */
+body, h1, h2, h3, h4, h5, h6, hr, p, blockquote, dl, dt, dd, ul, ol, li, pre, form, fieldset, lengend, button, input, textarea {margin: 0;padding: 0;}
+body, button, input, select, textarea {font: 12px/1 Arial, Helvetica, sans-serif;}
+body, table, td, div, p{word-wrap:break-word;}
+h1, h2, h3, h4, h5, h6 {line-height:2;}
+h1{font-size:18px;}
+h2{font-size:16px;}
+h3{font-size:14px;}
+h4, h5, h6{font-size: 100%;}
+address, cite, dfn, em, var{font-style: normal;}
+code, kbd, pre, samp, tt{font-family: "Courier New", Courier, monospace;} 
+small{font-size: 12px;} 
+ul, ol{list-style: none;}
+abbr[title], acronym[title]{border-bottom: 1px dotted;cursor: help;}
+q:before, q:after{content: '';}
+fieldset, img{border: none;} 
+button, input, select, textarea{font-size: 100%;}
+table {border-collapse: collapse;border-spacing: 0;}
+hr {border: none;height: 1px;}
+body {color:#666;}
+a {outline:none;}
+a, a:visited {text-decoration:none;color:#36C;}
+a:hover{text-decoration:underline;color:#F60;}
+li a, li a:visited{text-decoration:none;color:#333}
+li a:hover{text-decoration:underline;color:#F60;}
+em{color:#F00;}
+p{margin-bottom:10px; line-height:1.6em;}
+/* ---- reset ---- */
+
+/* ---- grid ---- */
+.col-main{float: left;width:100%;}
+.col-sub,.col-extra{float:left;}
+
+.grid-c {width:960px; margin:0 auto;}
+.grid-c2-s5 .main-wrap{padding-left: 200px;}
+.grid-c2-s5 .col-sub{width: 190px; margin-left: -100%;}
+.grid-c2-s6 .main-wrap{margin-left: 240px;}
+.grid-c2-s6 .col-sub{width: 230px; margin-left: -100%; }
+.grid-c2-s6f .main-wrap{margin-right:240px;}
+.grid-c2-s6f .col-extra{width: 230px; margin-left: -230px;}
+.grid-c3-s6e5 .main-wrap{margin: 0 200px 0 240px;}
+.grid-c3-s6e5 .col-sub{width: 230px; margin-left: -100%;}
+.grid-c3-s6e5 .col-extra{width: 190px; margin-left: -190px;}
+
+.grid-c:after,
+.grid-c2-s5:after,
+.grid-c2-s6:after,
+.grid-c2-s6f:after,
+.grid-c3-s6e5:after,
+.main-wrap:after,
+.col-sub:after,
+.col-extra:after, .clearfix:after{display:block;content:'\0020';clear:both;height:0;}
+.grid-c, .grid-c2-s5, .grid-c2-s6, .grid-c2-s6f, .grid-c3-s6e5, .main-wrap, .col-sub, .col-extra, .clearfix {zoom:1;}
+
+.grid-c .main-wrap {padding:40px;}
+/* ---- grid ---- */
+
+.clearfix {display:inline-table; zoom:1; _height:1%; display:block;}
+.clearfix:after {content:"."; display:block; font-size:0; line-height:0; height:0; clear:both; visibility:hidden;}
+
+fieldset {margin:1em 0; padding:1em; border:1px solid #B8D4E8;}
+fieldset p {margin:2px 12px 10px 10px;}
+fieldset label {display:block;}
+fieldset label.inline {display:inline;}
+legend {font-size:1.1em; font-weight:600; padding:2px 4px 8px;}
+input.text-entry {width:100px; border:1px solid #B8D4E8;}
+input.password-entry {width:100px; border:1px solid #B8D4E8;}
+.failure-notification {font-size:1.2em; color: Red;}
+.submit-button {text-align:right; padding-right:10px;}
+.bold {font-weight:bold;}
+
+.input-button {background-color:#005EAC; border:1px solid #124680; border-color:#B8D4E8 #124680 #124680 #B8D4E8; color:#fff; cursor:pointer; height:25px; line-height:25px; text-align:center; padding:0 10px; float:left; margin-right:10px;}
+a.input-button {height:23px; line-height:23px; color:#fff;}
+#search-btn.input-button {float:none;}
+
+.header {background-color:#005EAC; color:#fff; overflow:hidden;}
+.header-inner {width:960px; margin:0 auto;}
+.header .logo {font:bold 32px/2 arial; color:#fff; margin-right:20px; text-decoration:none; float:left;}
+.header .version {float:left; margin:32px 40px 0 0;}
+.header .loginDisplay {float:right; margin-top:-60px;}
+.header .loginDisplay a {color:#fff;}
+.header .top-nav {margin-top:24px; font:bold 18px arial;}
+.header .top-nav li {width:100px;}
+.header .top-nav a {color:#fff;}
+
+.sidebar {font:bold 18px/2 arial; margin:40px;}
+
+.pager {line-height:2; border-top:1px solid #ccc; margin-top:20px; overflow:hidden;}
+.pager .pager-nav {float:left;}
+.pager .pager-count {float:right;}
+
+.footer {font:12px/1.5 arial; color:#999; min-width:870px; margin:0 40px; padding:10px 0; position:relative; top:40px; clear:both; text-align:center; border-top:1px solid #ccc;}
+.footer a:link, .footer a:visited {color:#666;}
+
+.account-info {width:180px;}
+textarea#content {width:100%; min-height:300px;}
+.state-list label {display:inline; margin-right:20px;}

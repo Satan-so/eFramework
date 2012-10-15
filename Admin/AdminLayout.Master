@@ -1,0 +1,68 @@
+﻿<%@ Master Language="C#" AutoEventWireup="true" Inherits="GHY.EF.Admin.AdminLayout" %>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head runat="server">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title></title>
+    <link href="/css/common.css" rel="stylesheet" type="text/css" />
+    <asp:ContentPlaceHolder ID="headContent" runat="server">
+    </asp:ContentPlaceHolder>
+    <link rel="icon" href="http://zixi.mobi/favicon.ico" type="image/x-icon" />
+    <link rel="shortcut icon" href="http://zixi.mobi/favicon.ico" type="image/x-icon" />
+</head>
+<body>
+    <form runat="server">
+
+    <div class="header" id="header">
+		<div class="header-inner">
+			<a class="logo" href="/" title="返回EF首页">eFramework</a>
+            <div class="version">Preview Version</div>
+
+            <asp:Menu ID="navigationMenu" runat="server" CssClass="top-nav" IncludeStyleBlock="false" Orientation="Horizontal">
+                <Items>
+                    <asp:MenuItem NavigateUrl="~/content/add_info.aspx" Text="内容维护"/>
+                    <asp:MenuItem NavigateUrl="~/users/user_list.aspx" Text="成员管理"/>
+                    <asp:MenuItem NavigateUrl="#" Text="技术维护"/>
+                </Items>
+            </asp:Menu>
+
+            <div class="loginDisplay">
+                <asp:LoginView ID="headLoginView" runat="server">
+                    <AnonymousTemplate>
+                        [ <a href="/users/login.aspx" title="登录">Login</a> ]
+                    </AnonymousTemplate>
+                    <LoggedInTemplate>
+                        Welcome <span class="bold"><asp:LoginName ID="headLoginName" runat="server" /></span>!
+                        [ <a href="/users/change_password.aspx">Change Password</a> | 
+                        <asp:LoginStatus ID="headLoginStatus" runat="server" LogoutAction="Redirect" LogoutText="Logout" LogoutPageUrl="/" ToolTip="登出" /> ]
+                    </LoggedInTemplate>
+                </asp:LoginView>
+            </div>
+
+		</div>
+	</div>
+
+    <div class="grid-c grid-c2-s6">
+        <div class="col-main">
+			<div class="main-wrap">
+        <asp:ContentPlaceHolder ID="mainContent" runat="server">
+        
+        </asp:ContentPlaceHolder>
+            </div>
+        </div>
+
+        <div class="col-sub">
+            <asp:ContentPlaceHolder ID="sideBarContent" runat="server">
+        
+            </asp:ContentPlaceHolder>
+        </div>
+    </div>
+
+    <div class="footer clearfix">
+		<p>Copyright © 2001 - 2011 by <a href="http://ghy.cn/" title="西南财经大学光华园网站">GHY</a>. All Rights Reserved.</p>
+
+        <p>Latest version released by <a href="mailto:satan@satan.name" rel="nofollow" title="邮件联系Satan">Satan</a>.</p>
+	</div>
+    </form>
+</body>
+</html>

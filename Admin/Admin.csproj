@@ -1,0 +1,530 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>
+    </ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{E407A2E2-B70B-428A-B59F-DE0D59CF10CC}</ProjectGuid>
+    <ProjectTypeGuids>{349c5851-65df-11da-9384-00065b846f21};{fae04ec0-301f-11d3-bf4b-00c04f79efbc}</ProjectTypeGuids>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>GHY.EF.Admin</RootNamespace>
+    <AssemblyName>GHY.EF.Admin</AssemblyName>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Web" />
+    <Reference Include="System.Configuration" />
+    <Reference Include="System.Web.ApplicationServices" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="content\add_article.aspx" />
+    <Content Include="content\add_info.aspx" />
+    <Content Include="content\add_node.aspx" />
+    <Content Include="content\content_sidebar.ascx" />
+    <Content Include="content\info_list.aspx" />
+    <Content Include="content\info_manager.aspx" />
+    <Content Include="content\node_manager.aspx" />
+    <Content Include="content\update_article.aspx" />
+    <Content Include="content\update_node.aspx" />
+    <Content Include="controls\pager.ascx" />
+    <Content Include="css\common.css" />
+    <Content Include="error.aspx" />
+    <Content Include="index.aspx" />
+    <Content Include="js\pager.js" />
+    <Content Include="Global.asax" />
+    <Content Include="js\jq.js" />
+    <Content Include="js\xheditor.js" />
+    <Content Include="users\add_user.aspx" />
+    <Content Include="users\change_password.aspx" />
+    <Content Include="users\change_password_success.aspx" />
+    <Content Include="users\login.aspx" />
+    <Content Include="users\update_user.aspx" />
+    <Content Include="users\users_sidebar.ascx" />
+    <Content Include="users\user_list.aspx" />
+    <Content Include="Web.config" />
+    <Content Include="Web.Debug.config">
+      <DependentUpon>Web.config</DependentUpon>
+    </Content>
+    <Content Include="Web.Release.config">
+      <DependentUpon>Web.config</DependentUpon>
+    </Content>
+    <Content Include="js\xheditor_emot\default\angry.gif" />
+    <Content Include="js\xheditor_emot\default\awkward.gif" />
+    <Content Include="js\xheditor_emot\default\bye.gif" />
+    <Content Include="js\xheditor_emot\default\config.txt" />
+    <Content Include="js\xheditor_emot\default\crazy.gif" />
+    <Content Include="js\xheditor_emot\default\cry.gif" />
+    <Content Include="js\xheditor_emot\default\curse.gif" />
+    <Content Include="js\xheditor_emot\default\cute.gif" />
+    <Content Include="js\xheditor_emot\default\despise.gif" />
+    <Content Include="js\xheditor_emot\default\doubt.gif" />
+    <Content Include="js\xheditor_emot\default\envy.gif" />
+    <Content Include="js\xheditor_emot\default\fastcry.gif" />
+    <Content Include="js\xheditor_emot\default\knock.gif" />
+    <Content Include="js\xheditor_emot\default\laugh.gif" />
+    <Content Include="js\xheditor_emot\default\mad.gif" />
+    <Content Include="js\xheditor_emot\default\ohmy.gif" />
+    <Content Include="js\xheditor_emot\default\panic.gif" />
+    <Content Include="js\xheditor_emot\default\proud.gif" />
+    <Content Include="js\xheditor_emot\default\quiet.gif" />
+    <Content Include="js\xheditor_emot\default\sad.gif" />
+    <Content Include="js\xheditor_emot\default\shutup.gif" />
+    <Content Include="js\xheditor_emot\default\shy.gif" />
+    <Content Include="js\xheditor_emot\default\sleep.gif" />
+    <Content Include="js\xheditor_emot\default\smile.gif" />
+    <Content Include="js\xheditor_emot\default\struggle.gif" />
+    <Content Include="js\xheditor_emot\default\titter.gif" />
+    <Content Include="js\xheditor_emot\default\tongue.gif" />
+    <Content Include="js\xheditor_emot\default\wail.gif" />
+    <Content Include="js\xheditor_emot\default\wronged.gif" />
+    <Content Include="js\xheditor_emot\ipb\alien.gif" />
+    <Content Include="js\xheditor_emot\ipb\angel.gif" />
+    <Content Include="js\xheditor_emot\ipb\angry.gif" />
+    <Content Include="js\xheditor_emot\ipb\bandit.gif" />
+    <Content Include="js\xheditor_emot\ipb\biglaugh.gif" />
+    <Content Include="js\xheditor_emot\ipb\blink.gif" />
+    <Content Include="js\xheditor_emot\ipb\blush.gif" />
+    <Content Include="js\xheditor_emot\ipb\config.txt" />
+    <Content Include="js\xheditor_emot\ipb\cool.gif" />
+    <Content Include="js\xheditor_emot\ipb\cry.gif" />
+    <Content Include="js\xheditor_emot\ipb\depres.gif" />
+    <Content Include="js\xheditor_emot\ipb\devil.gif" />
+    <Content Include="js\xheditor_emot\ipb\glare.gif" />
+    <Content Include="js\xheditor_emot\ipb\heart.gif" />
+    <Content Include="js\xheditor_emot\ipb\joyful.gif" />
+    <Content Include="js\xheditor_emot\ipb\kiss.gif" />
+    <Content Include="js\xheditor_emot\ipb\laugh.gif" />
+    <Content Include="js\xheditor_emot\ipb\magician.gif" />
+    <Content Include="js\xheditor_emot\ipb\ninja.gif" />
+    <Content Include="js\xheditor_emot\ipb\pinch.gif" />
+    <Content Include="js\xheditor_emot\ipb\police.gif" />
+    <Content Include="js\xheditor_emot\ipb\sad.gif" />
+    <Content Include="js\xheditor_emot\ipb\sick.gif" />
+    <Content Include="js\xheditor_emot\ipb\sideways.gif" />
+    <Content Include="js\xheditor_emot\ipb\sleep.gif" />
+    <Content Include="js\xheditor_emot\ipb\smile.gif" />
+    <Content Include="js\xheditor_emot\ipb\surprised.gif" />
+    <Content Include="js\xheditor_emot\ipb\tongue.gif" />
+    <Content Include="js\xheditor_emot\ipb\unsure.gif" />
+    <Content Include="js\xheditor_emot\ipb\w00t.gif" />
+    <Content Include="js\xheditor_emot\ipb\whistling.gif" />
+    <Content Include="js\xheditor_emot\ipb\wondering.gif" />
+    <Content Include="js\xheditor_emot\ipb\wub.gif" />
+    <Content Include="js\xheditor_emot\msn\1.gif" />
+    <Content Include="js\xheditor_emot\msn\10.gif" />
+    <Content Include="js\xheditor_emot\msn\11.gif" />
+    <Content Include="js\xheditor_emot\msn\12.gif" />
+    <Content Include="js\xheditor_emot\msn\13.gif" />
+    <Content Include="js\xheditor_emot\msn\14.gif" />
+    <Content Include="js\xheditor_emot\msn\15.gif" />
+    <Content Include="js\xheditor_emot\msn\16.gif" />
+    <Content Include="js\xheditor_emot\msn\17.gif" />
+    <Content Include="js\xheditor_emot\msn\18.gif" />
+    <Content Include="js\xheditor_emot\msn\19.gif" />
+    <Content Include="js\xheditor_emot\msn\2.gif" />
+    <Content Include="js\xheditor_emot\msn\20.gif" />
+    <Content Include="js\xheditor_emot\msn\21.gif" />
+    <Content Include="js\xheditor_emot\msn\22.gif" />
+    <Content Include="js\xheditor_emot\msn\23.gif" />
+    <Content Include="js\xheditor_emot\msn\24.gif" />
+    <Content Include="js\xheditor_emot\msn\25.gif" />
+    <Content Include="js\xheditor_emot\msn\26.gif" />
+    <Content Include="js\xheditor_emot\msn\27.gif" />
+    <Content Include="js\xheditor_emot\msn\28.gif" />
+    <Content Include="js\xheditor_emot\msn\29.gif" />
+    <Content Include="js\xheditor_emot\msn\3.gif" />
+    <Content Include="js\xheditor_emot\msn\30.gif" />
+    <Content Include="js\xheditor_emot\msn\31.gif" />
+    <Content Include="js\xheditor_emot\msn\32.gif" />
+    <Content Include="js\xheditor_emot\msn\33.gif" />
+    <Content Include="js\xheditor_emot\msn\34.gif" />
+    <Content Include="js\xheditor_emot\msn\35.gif" />
+    <Content Include="js\xheditor_emot\msn\36.gif" />
+    <Content Include="js\xheditor_emot\msn\37.gif" />
+    <Content Include="js\xheditor_emot\msn\38.gif" />
+    <Content Include="js\xheditor_emot\msn\39.gif" />
+    <Content Include="js\xheditor_emot\msn\4.gif" />
+    <Content Include="js\xheditor_emot\msn\40.gif" />
+    <Content Include="js\xheditor_emot\msn\5.gif" />
+    <Content Include="js\xheditor_emot\msn\6.gif" />
+    <Content Include="js\xheditor_emot\msn\7.gif" />
+    <Content Include="js\xheditor_emot\msn\8.gif" />
+    <Content Include="js\xheditor_emot\msn\9.gif" />
+    <Content Include="js\xheditor_emot\pidgin\angry.gif" />
+    <Content Include="js\xheditor_emot\pidgin\bad.gif" />
+    <Content Include="js\xheditor_emot\pidgin\blush.gif" />
+    <Content Include="js\xheditor_emot\pidgin\brokenheart.gif" />
+    <Content Include="js\xheditor_emot\pidgin\bye.gif" />
+    <Content Include="js\xheditor_emot\pidgin\coffee.gif" />
+    <Content Include="js\xheditor_emot\pidgin\config.txt" />
+    <Content Include="js\xheditor_emot\pidgin\cool.gif" />
+    <Content Include="js\xheditor_emot\pidgin\cry.gif" />
+    <Content Include="js\xheditor_emot\pidgin\curse.gif" />
+    <Content Include="js\xheditor_emot\pidgin\cute.gif" />
+    <Content Include="js\xheditor_emot\pidgin\devil.gif" />
+    <Content Include="js\xheditor_emot\pidgin\envy.gif" />
+    <Content Include="js\xheditor_emot\pidgin\gift.gif" />
+    <Content Include="js\xheditor_emot\pidgin\good.gif" />
+    <Content Include="js\xheditor_emot\pidgin\kiss.gif" />
+    <Content Include="js\xheditor_emot\pidgin\laugh.gif" />
+    <Content Include="js\xheditor_emot\pidgin\love.gif" />
+    <Content Include="js\xheditor_emot\pidgin\music.gif" />
+    <Content Include="js\xheditor_emot\pidgin\question.gif" />
+    <Content Include="js\xheditor_emot\pidgin\rose.gif" />
+    <Content Include="js\xheditor_emot\pidgin\sad.gif" />
+    <Content Include="js\xheditor_emot\pidgin\shocked.gif" />
+    <Content Include="js\xheditor_emot\pidgin\shout.gif" />
+    <Content Include="js\xheditor_emot\pidgin\sick.gif" />
+    <Content Include="js\xheditor_emot\pidgin\sleepy.gif" />
+    <Content Include="js\xheditor_emot\pidgin\smile.gif" />
+    <Content Include="js\xheditor_emot\pidgin\soccer.gif" />
+    <Content Include="js\xheditor_emot\pidgin\sweat.gif" />
+    <Content Include="js\xheditor_emot\pidgin\tired.gif" />
+    <Content Include="js\xheditor_emot\pidgin\tongue.gif" />
+    <Content Include="js\xheditor_emot\pidgin\victory.gif" />
+    <Content Include="js\xheditor_emot\pidgin\wink.gif" />
+    <Content Include="js\xheditor_plugins\multiupload\img\add.gif" />
+    <Content Include="js\xheditor_plugins\multiupload\img\bg1.gif" />
+    <Content Include="js\xheditor_plugins\multiupload\img\bg2.gif" />
+    <Content Include="js\xheditor_plugins\multiupload\img\btnbg.gif" />
+    <Content Include="js\xheditor_plugins\multiupload\img\btnbgr.gif" />
+    <Content Include="js\xheditor_plugins\multiupload\img\clear.gif" />
+    <Content Include="js\xheditor_plugins\multiupload\img\progressbg.gif" />
+    <Content Include="js\xheditor_plugins\multiupload\img\start.gif" />
+    <Content Include="js\xheditor_plugins\multiupload\multiupload.css" />
+    <Content Include="js\xheditor_plugins\multiupload\multiupload.html" />
+    <Content Include="js\xheditor_plugins\multiupload\multiupload.js" />
+    <Content Include="js\xheditor_plugins\multiupload\swfupload\swfupload.js" />
+    <Content Include="js\xheditor_plugins\multiupload\swfupload\swfupload.swf" />
+    <Content Include="js\xheditor_plugins\ubb.min.js" />
+    <Content Include="js\xheditor_skin\default\iframe.css" />
+    <Content Include="js\xheditor_skin\default\img\close.gif" />
+    <Content Include="js\xheditor_skin\default\img\flash.gif" />
+    <Content Include="js\xheditor_skin\default\img\icons.gif" />
+    <Content Include="js\xheditor_skin\default\img\loading.gif" />
+    <Content Include="js\xheditor_skin\default\img\progress.gif" />
+    <Content Include="js\xheditor_skin\default\img\progressbg.gif" />
+    <Content Include="js\xheditor_skin\default\img\tag-address.gif" />
+    <Content Include="js\xheditor_skin\default\img\tag-div.gif" />
+    <Content Include="js\xheditor_skin\default\img\tag-h1.gif" />
+    <Content Include="js\xheditor_skin\default\img\tag-h2.gif" />
+    <Content Include="js\xheditor_skin\default\img\tag-h3.gif" />
+    <Content Include="js\xheditor_skin\default\img\tag-h4.gif" />
+    <Content Include="js\xheditor_skin\default\img\tag-h5.gif" />
+    <Content Include="js\xheditor_skin\default\img\tag-h6.gif" />
+    <Content Include="js\xheditor_skin\default\img\tag-p.gif" />
+    <Content Include="js\xheditor_skin\default\img\tag-pre.gif" />
+    <Content Include="js\xheditor_skin\default\img\waiting.gif" />
+    <Content Include="js\xheditor_skin\default\img\wmp.gif" />
+    <Content Include="js\xheditor_skin\default\ui.css" />
+    <Content Include="js\xheditor_skin\nostyle\iframe.css" />
+    <Content Include="js\xheditor_skin\nostyle\img\close.gif" />
+    <Content Include="js\xheditor_skin\nostyle\img\flash.gif" />
+    <Content Include="js\xheditor_skin\nostyle\img\icons.gif" />
+    <Content Include="js\xheditor_skin\nostyle\img\loading.gif" />
+    <Content Include="js\xheditor_skin\nostyle\img\progress.gif" />
+    <Content Include="js\xheditor_skin\nostyle\img\progressbg.gif" />
+    <Content Include="js\xheditor_skin\nostyle\img\tag-address.gif" />
+    <Content Include="js\xheditor_skin\nostyle\img\tag-div.gif" />
+    <Content Include="js\xheditor_skin\nostyle\img\tag-h1.gif" />
+    <Content Include="js\xheditor_skin\nostyle\img\tag-h2.gif" />
+    <Content Include="js\xheditor_skin\nostyle\img\tag-h3.gif" />
+    <Content Include="js\xheditor_skin\nostyle\img\tag-h4.gif" />
+    <Content Include="js\xheditor_skin\nostyle\img\tag-h5.gif" />
+    <Content Include="js\xheditor_skin\nostyle\img\tag-h6.gif" />
+    <Content Include="js\xheditor_skin\nostyle\img\tag-p.gif" />
+    <Content Include="js\xheditor_skin\nostyle\img\tag-pre.gif" />
+    <Content Include="js\xheditor_skin\nostyle\img\waiting.gif" />
+    <Content Include="js\xheditor_skin\nostyle\img\wmp.gif" />
+    <Content Include="js\xheditor_skin\nostyle\ui.css" />
+    <Content Include="js\xheditor_skin\o2007blue\iframe.css" />
+    <Content Include="js\xheditor_skin\o2007blue\img\buttonbg.gif" />
+    <Content Include="js\xheditor_skin\o2007blue\img\close.gif" />
+    <Content Include="js\xheditor_skin\o2007blue\img\flash.gif" />
+    <Content Include="js\xheditor_skin\o2007blue\img\icons.gif" />
+    <Content Include="js\xheditor_skin\o2007blue\img\loading.gif" />
+    <Content Include="js\xheditor_skin\o2007blue\img\progress.gif" />
+    <Content Include="js\xheditor_skin\o2007blue\img\progressbg.gif" />
+    <Content Include="js\xheditor_skin\o2007blue\img\tag-address.gif" />
+    <Content Include="js\xheditor_skin\o2007blue\img\tag-div.gif" />
+    <Content Include="js\xheditor_skin\o2007blue\img\tag-h1.gif" />
+    <Content Include="js\xheditor_skin\o2007blue\img\tag-h2.gif" />
+    <Content Include="js\xheditor_skin\o2007blue\img\tag-h3.gif" />
+    <Content Include="js\xheditor_skin\o2007blue\img\tag-h4.gif" />
+    <Content Include="js\xheditor_skin\o2007blue\img\tag-h5.gif" />
+    <Content Include="js\xheditor_skin\o2007blue\img\tag-h6.gif" />
+    <Content Include="js\xheditor_skin\o2007blue\img\tag-p.gif" />
+    <Content Include="js\xheditor_skin\o2007blue\img\tag-pre.gif" />
+    <Content Include="js\xheditor_skin\o2007blue\img\waiting.gif" />
+    <Content Include="js\xheditor_skin\o2007blue\img\wmp.gif" />
+    <Content Include="js\xheditor_skin\o2007blue\ui.css" />
+    <Content Include="js\xheditor_skin\o2007silver\iframe.css" />
+    <Content Include="js\xheditor_skin\o2007silver\img\buttonbg.gif" />
+    <Content Include="js\xheditor_skin\o2007silver\img\close.gif" />
+    <Content Include="js\xheditor_skin\o2007silver\img\flash.gif" />
+    <Content Include="js\xheditor_skin\o2007silver\img\icons.gif" />
+    <Content Include="js\xheditor_skin\o2007silver\img\loading.gif" />
+    <Content Include="js\xheditor_skin\o2007silver\img\progress.gif" />
+    <Content Include="js\xheditor_skin\o2007silver\img\progressbg.gif" />
+    <Content Include="js\xheditor_skin\o2007silver\img\tag-address.gif" />
+    <Content Include="js\xheditor_skin\o2007silver\img\tag-div.gif" />
+    <Content Include="js\xheditor_skin\o2007silver\img\tag-h1.gif" />
+    <Content Include="js\xheditor_skin\o2007silver\img\tag-h2.gif" />
+    <Content Include="js\xheditor_skin\o2007silver\img\tag-h3.gif" />
+    <Content Include="js\xheditor_skin\o2007silver\img\tag-h4.gif" />
+    <Content Include="js\xheditor_skin\o2007silver\img\tag-h5.gif" />
+    <Content Include="js\xheditor_skin\o2007silver\img\tag-h6.gif" />
+    <Content Include="js\xheditor_skin\o2007silver\img\tag-p.gif" />
+    <Content Include="js\xheditor_skin\o2007silver\img\tag-pre.gif" />
+    <Content Include="js\xheditor_skin\o2007silver\img\waiting.gif" />
+    <Content Include="js\xheditor_skin\o2007silver\img\wmp.gif" />
+    <Content Include="js\xheditor_skin\o2007silver\ui.css" />
+    <Content Include="js\xheditor_skin\vista\iframe.css" />
+    <Content Include="js\xheditor_skin\vista\img\buttonbg.gif" />
+    <Content Include="js\xheditor_skin\vista\img\close.gif" />
+    <Content Include="js\xheditor_skin\vista\img\flash.gif" />
+    <Content Include="js\xheditor_skin\vista\img\icons.gif" />
+    <Content Include="js\xheditor_skin\vista\img\loading.gif" />
+    <Content Include="js\xheditor_skin\vista\img\progress.gif" />
+    <Content Include="js\xheditor_skin\vista\img\progressbg.gif" />
+    <Content Include="js\xheditor_skin\vista\img\tag-address.gif" />
+    <Content Include="js\xheditor_skin\vista\img\tag-div.gif" />
+    <Content Include="js\xheditor_skin\vista\img\tag-h1.gif" />
+    <Content Include="js\xheditor_skin\vista\img\tag-h2.gif" />
+    <Content Include="js\xheditor_skin\vista\img\tag-h3.gif" />
+    <Content Include="js\xheditor_skin\vista\img\tag-h4.gif" />
+    <Content Include="js\xheditor_skin\vista\img\tag-h5.gif" />
+    <Content Include="js\xheditor_skin\vista\img\tag-h6.gif" />
+    <Content Include="js\xheditor_skin\vista\img\tag-p.gif" />
+    <Content Include="js\xheditor_skin\vista\img\tag-pre.gif" />
+    <Content Include="js\xheditor_skin\vista\img\titlebg.gif" />
+    <Content Include="js\xheditor_skin\vista\img\waiting.gif" />
+    <Content Include="js\xheditor_skin\vista\img\wmp.gif" />
+    <Content Include="js\xheditor_skin\vista\ui.css" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="AdminLayout.Master.cs">
+      <DependentUpon>AdminLayout.Master</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="AdminLayout.Master.designer.cs">
+      <DependentUpon>AdminLayout.Master</DependentUpon>
+    </Compile>
+    <Compile Include="content\add_article.aspx.cs">
+      <DependentUpon>add_article.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="content\add_article.aspx.designer.cs">
+      <DependentUpon>add_article.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="content\add_info.aspx.cs">
+      <DependentUpon>add_info.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="content\add_info.aspx.designer.cs">
+      <DependentUpon>add_info.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="content\add_node.aspx.cs">
+      <DependentUpon>add_node.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="content\add_node.aspx.designer.cs">
+      <DependentUpon>add_node.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="content\content_sidebar.ascx.cs">
+      <DependentUpon>content_sidebar.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="content\content_sidebar.ascx.designer.cs">
+      <DependentUpon>content_sidebar.ascx</DependentUpon>
+    </Compile>
+    <Compile Include="content\info_list.aspx.cs">
+      <DependentUpon>info_list.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="content\info_list.aspx.designer.cs">
+      <DependentUpon>info_list.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="content\info_manager.aspx.cs">
+      <DependentUpon>info_manager.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="content\info_manager.aspx.designer.cs">
+      <DependentUpon>info_manager.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="content\node_manager.aspx.cs">
+      <DependentUpon>node_manager.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="content\node_manager.aspx.designer.cs">
+      <DependentUpon>node_manager.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="content\update_article.aspx.cs">
+      <DependentUpon>update_article.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="content\update_article.aspx.designer.cs">
+      <DependentUpon>update_article.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="content\update_node.aspx.cs">
+      <DependentUpon>update_node.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="content\update_node.aspx.designer.cs">
+      <DependentUpon>update_node.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="controls\pager.ascx.cs">
+      <DependentUpon>pager.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="controls\pager.ascx.designer.cs">
+      <DependentUpon>pager.ascx</DependentUpon>
+    </Compile>
+    <Compile Include="error.aspx.cs">
+      <DependentUpon>error.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="error.aspx.designer.cs">
+      <DependentUpon>error.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Global.asax.cs">
+      <DependentUpon>Global.asax</DependentUpon>
+    </Compile>
+    <Compile Include="index.aspx.cs">
+      <DependentUpon>index.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="index.aspx.designer.cs">
+      <DependentUpon>index.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="users\add_user.aspx.cs">
+      <DependentUpon>add_user.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="users\add_user.aspx.designer.cs">
+      <DependentUpon>add_user.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="users\change_password.aspx.cs">
+      <DependentUpon>change_password.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="users\change_password.aspx.designer.cs">
+      <DependentUpon>change_password.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="users\change_password_success.aspx.cs">
+      <DependentUpon>change_password_success.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="users\change_password_success.aspx.designer.cs">
+      <DependentUpon>change_password_success.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="users\login.aspx.cs">
+      <DependentUpon>login.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="users\login.aspx.designer.cs">
+      <DependentUpon>login.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="users\update_user.aspx.cs">
+      <DependentUpon>update_user.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="users\update_user.aspx.designer.cs">
+      <DependentUpon>update_user.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="users\users_sidebar.ascx.cs">
+      <DependentUpon>users_sidebar.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="users\users_sidebar.ascx.designer.cs">
+      <DependentUpon>users_sidebar.ascx</DependentUpon>
+    </Compile>
+    <Compile Include="users\user_list.aspx.cs">
+      <DependentUpon>user_list.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="users\user_list.aspx.designer.cs">
+      <DependentUpon>user_list.aspx</DependentUpon>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Article\Article.csproj">
+      <Project>{2F8A7773-1594-430A-9D69-F3A4F540AFB0}</Project>
+      <Name>Article</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Core\Core.csproj">
+      <Project>{22CEE161-4026-4F0A-A9EB-8412B3C7F7C8}</Project>
+      <Name>Core</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Security\Security.csproj">
+      <Project>{9907241B-FC9D-49C1-9F0F-0A4CE182063F}</Project>
+      <Name>Security</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="AdminLayout.Master" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="css\Web.config">
+      <SubType>Designer</SubType>
+    </Content>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="js\Web.config">
+      <SubType>Designer</SubType>
+    </Content>
+  </ItemGroup>
+  <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
+  <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v10.0\WebApplications\Microsoft.WebApplication.targets" />
+  <ProjectExtensions>
+    <VisualStudio>
+      <FlavorProperties GUID="{349c5851-65df-11da-9384-00065b846f21}">
+        <WebProjectProperties>
+          <UseIIS>False</UseIIS>
+          <AutoAssignPort>True</AutoAssignPort>
+          <DevelopmentServerPort>6874</DevelopmentServerPort>
+          <DevelopmentServerVPath>/</DevelopmentServerVPath>
+          <IISUrl>
+          </IISUrl>
+          <NTLMAuthentication>False</NTLMAuthentication>
+          <UseCustomServer>False</UseCustomServer>
+          <CustomServerUrl>
+          </CustomServerUrl>
+          <SaveServerSettingsInUserFile>False</SaveServerSettingsInUserFile>
+        </WebProjectProperties>
+      </FlavorProperties>
+    </VisualStudio>
+  </ProjectExtensions>
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>
