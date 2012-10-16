@@ -1,12 +1,10 @@
-﻿using System;
-using System.Collections.Specialized;
-using System.Data;
+﻿using System.Collections.Specialized;
 using System.Diagnostics.Contracts;
+using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
 using System.Web.Hosting;
 using System.Web.Security;
-using GHY.EF.Core.Data;
 
 namespace GHY.EF.Security
 {
@@ -16,7 +14,7 @@ namespace GHY.EF.Security
     public class EFMembershipProvider : MembershipProvider
     {
         #region 私有字段
-        Database db;
+        string connStrName;
         #endregion
 
         #region 私有方法
@@ -24,12 +22,12 @@ namespace GHY.EF.Security
         {
             byte[] data;
 
-            using (MD5CryptoServiceProvider md5Hasher = new MD5CryptoServiceProvider())
+            using (var md5Hasher = new MD5CryptoServiceProvider())
             {
                 data = md5Hasher.ComputeHash(Encoding.Default.GetBytes(password));
             }
 
-            StringBuilder sBuilder = new StringBuilder();
+            var sBuilder = new StringBuilder();
 
             for (int i = 0; i < data.Length; i++)
             {
@@ -39,16 +37,9 @@ namespace GHY.EF.Security
             return sBuilder.ToString();
         }
 
-        EFUser PopulateUser(IDataReader reader)
+        SecurityEntities getDBContext()
         {
-            EFUser user = new EFUser(this.Name, reader["UserName"].ToString(), null, reader["Email"].ToString(), string.Empty, reader["Comment"].ToString(), (bool)reader["IsApproved"], false, (DateTime)reader["CreationDate"], (DateTime)reader["LastLoginDate"], DateTime.Now, (DateTime)reader["LastPasswordChangedDate"], DateTime.Now)
-            {
-                UserId = (int)reader["UserId"],
-                RealName = reader["RealName"].ToString(),
-                TelNumber = reader["TelNumber"].ToString()
-            };
-
-            return user;
+            return new SecurityEntities(this.connStrName);
         }
         #endregion
 
@@ -130,23 +121,20 @@ namespace GHY.EF.Security
         public override bool ChangePassword(string userName, string oldPassword, string newPassword)
         {
             Contract.Requires(!string.IsNullOrWhiteSpace(userName));
+            Contract.Requires(!string.IsNullOrWhiteSpace(oldPassword));
+            Contract.Requires(!string.IsNullOrWhiteSpace(newPassword));
 
             if (!this.ValidateUser(userName, oldPassword))
             {
                 return false;
             }
 
-            IDataParameter[] parameters = new IDataParameter[3];
-
-            parameters[0] = this.db.NewDataParameter("@UserName", userName);
-            parameters[1] = this.db.NewDataParameter("@Password", this.EncodePassword(newPassword));
-            parameters[2] = this.db.NewDataParameter("@ApplicationName", this.ApplicationName);
-
-            int result = this.db.ExecuteNonQuery(CommandType.StoredProcedure, "EF_Membership_ChangePassword", parameters);
-
-            if (result == 0)
+            using (var db = this.getDBContext())
             {
-                return false;
+                var dbUser = db.Users.Single(u => u.UserName == userName && u.ApplicationName == this.ApplicationName);
+
+                dbUser.Password = this.EncodePassword(newPassword);
+                db.SaveChanges();
             }
 
             return true;
@@ -181,6 +169,7 @@ namespace GHY.EF.Security
         public override MembershipUser CreateUser(string userName, string password, string email, string passwordQuestion, string passwordAnswer, bool isApproved, object providerUserKey, out MembershipCreateStatus status)
         {
             Contract.Requires(!string.IsNullOrWhiteSpace(userName));
+            Contract.Requires(!string.IsNullOrWhiteSpace(password));
 
             if (this.GetUser(userName, false) != null)
             {
@@ -188,20 +177,17 @@ namespace GHY.EF.Security
                 return null;
             }
 
-            IDataParameter[] parameters = new IDataParameter[5];
-
-            parameters[0] = this.db.NewDataParameter("@UserName", userName);
-            parameters[1] = this.db.NewDataParameter("@Password", this.EncodePassword(password));
-            parameters[2] = this.db.NewDataParameter("@Email", email);
-            parameters[3] = this.db.NewDataParameter("@IsApproved", isApproved);
-            parameters[4] = this.db.NewDataParameter("@ApplicationName", this.ApplicationName);
-
-            int result = this.db.ExecuteNonQuery(CommandType.StoredProcedure, "EF_Membership_Add", parameters);
-
-            if (result == 0)
+            using (var db = this.getDBContext())
             {
-                status = MembershipCreateStatus.ProviderError;
-                return null;
+                var user = new EFUser();
+                user.UserName = userName;
+                user.Password = this.EncodePassword(password);
+                user.Email = email;
+                user.IsApproved = isApproved;
+                user.ApplicationName = this.ApplicationName;
+                db.Users.Add(user);
+
+                db.SaveChanges();
             }
 
             status = MembershipCreateStatus.Success;
@@ -249,28 +235,23 @@ namespace GHY.EF.Security
             Contract.Requires(pageIndex > 0);
             Contract.Requires(pageSize > 0);
 
-            IDataParameter[] parameters = new IDataParameter[5];
-
-            parameters[0] = this.db.NewDataParameter("@SearchName", "%" + userNameToMatch + "%");
-            parameters[1] = this.db.NewDataParameter("@PageIndex", pageIndex);
-            parameters[2] = this.db.NewDataParameter("@PageSize", pageSize);
-            parameters[3] = this.db.NewDataParameter("@ApplicationName", this.ApplicationName);
-            parameters[4] = this.db.NewOutputDataParameter("@Count");
-            parameters[4].DbType = DbType.Int32;
-
-            MembershipUserCollection users = new MembershipUserCollection();
-
-            using (IDataReader reader = this.db.ExcuteReader(CommandType.StoredProcedure, "EF_Membership_FindByName", parameters))
+            using (var db = this.getDBContext())
             {
-                while (reader.Read())
+                totalRecords = db.Users.Count(u => u.ApplicationName == this.ApplicationName
+                    && (u.UserName.Contains(userNameToMatch) || u.RealName.Contains(userNameToMatch)));
+                var dbUsers = db.Users.Where(u => u.ApplicationName == this.ApplicationName
+                    && (u.UserName.Contains(userNameToMatch) || u.RealName.Contains(userNameToMatch)))
+                    .OrderByDescending(u => u.Id).Skip((pageIndex - 1) * pageSize).Take(pageSize);
+
+                var users = new MembershipUserCollection();
+
+                foreach (var user in dbUsers)
                 {
-                    users.Add(this.PopulateUser(reader));
+                    users.Add(user);
                 }
+
+                return users;
             }
-
-            totalRecords = (int)this.db.GetOutputDataParameter("@Count").Value;
-
-            return users;
         }
 
         /// <summary>
@@ -285,27 +266,21 @@ namespace GHY.EF.Security
             Contract.Requires(pageIndex > 0);
             Contract.Requires(pageSize > 0);
 
-            IDataParameter[] parameters = new IDataParameter[4];
-
-            parameters[0] = this.db.NewDataParameter("@PageIndex", pageIndex);
-            parameters[1] = this.db.NewDataParameter("@PageSize", pageSize);
-            parameters[2] = this.db.NewDataParameter("@ApplicationName", this.ApplicationName);
-            parameters[3] = this.db.NewOutputDataParameter("@Count");
-            parameters[3].DbType = DbType.Int32;
-
-            MembershipUserCollection users = new MembershipUserCollection();
-
-            using (IDataReader reader = this.db.ExcuteReader(CommandType.StoredProcedure, "EF_Membership_GetAll", parameters))
+            using (var db = this.getDBContext())
             {
-                while (reader.Read())
+                totalRecords = db.Users.Count(u => u.ApplicationName == this.ApplicationName);
+                var dbUsers = db.Users.Where(u => u.ApplicationName == this.ApplicationName)
+                    .OrderByDescending(u => u.Id).Skip((pageIndex - 1) * pageSize).Take(pageSize);
+
+                MembershipUserCollection users = new MembershipUserCollection();
+
+                foreach (var user in dbUsers)
                 {
-                    users.Add(this.PopulateUser(reader));
+                    users.Add(user);
                 }
+
+                return users;
             }
-
-            totalRecords = (int)this.db.GetOutputDataParameter("@Count").Value;
-
-            return users;
         }
 
         /// <summary>
@@ -340,25 +315,11 @@ namespace GHY.EF.Security
         {
             Contract.Requires(!string.IsNullOrWhiteSpace(userName));
 
-            IDataParameter[] parameters = new IDataParameter[2];
-            parameters[0] = this.db.NewDataParameter("@UserName", userName);
-            parameters[1] = this.db.NewDataParameter("@ApplicationName", this.ApplicationName);
-
-            EFUser user;
-
-            using (IDataReader reader = this.db.ExcuteReader(CommandType.StoredProcedure, "EF_Membership_Get", parameters))
+            using (var db = this.getDBContext())
             {
-                if (reader.Read())
-                {
-                    user = this.PopulateUser(reader);
-                }
-                else
-                {
-                    user = null;
-                }
+                return db.Users.First(u =>
+                    u.UserName == userName && u.ApplicationName == this.ApplicationName && u.IsApproved == true);
             }
-
-            return user;
         }
 
         /// <summary>
@@ -404,8 +365,7 @@ namespace GHY.EF.Security
 
             base.Initialize(name, config);
             this.ApplicationName = string.IsNullOrEmpty(config["applicationName"]) ? HostingEnvironment.ApplicationVirtualPath : config["applicationName"];
-
-            this.db = new Database(config["connectionStringName"]);
+            this.connStrName = config["connectionStringName"];
         }
 
         /// <summary>
@@ -439,27 +399,25 @@ namespace GHY.EF.Security
         {
             Contract.Requires(user != null);
 
-            EFUser efUser = user as EFUser;
+            var efUser = user as EFUser;
+            Contract.Requires(efUser.Id > 0);
 
-            Contract.Requires(efUser.UserId > 0);
-
-            IDataParameter[] parameters = new IDataParameter[9];
-
-            parameters[0] = this.db.NewDataParameter("@UserId", efUser.UserId);
-            parameters[1] = this.db.NewDataParameter("@UserName", efUser.UserName);
-            parameters[2] = this.db.NewDataParameter("@Password", string.IsNullOrWhiteSpace(efUser.Password) ? string.Empty : this.EncodePassword(efUser.Password));
-            parameters[3] = this.db.NewDataParameter("@RealName", efUser.RealName);
-            parameters[4] = this.db.NewDataParameter("@Email", efUser.Email);
-            parameters[5] = this.db.NewDataParameter("@TelNumber", efUser.TelNumber);
-            parameters[6] = this.db.NewDataParameter("@Comment", efUser.Comment);
-            parameters[7] = this.db.NewDataParameter("@IsApproved", efUser.IsApproved);
-            parameters[8] = this.db.NewDataParameter("@ApplicationName", this.ApplicationName);
-
-            int result = this.db.ExecuteNonQuery(CommandType.StoredProcedure, "EF_Membership_Update", parameters);
-
-            if (result == 0)
+            using (var db = this.getDBContext())
             {
-                throw new Exception("更新应用失败！");
+                var dbUser = db.Users.Single(u => u.Id == efUser.Id && u.ApplicationName == this.ApplicationName);
+
+                if (!string.IsNullOrWhiteSpace(efUser.Password))
+                {
+                    dbUser.Password = this.EncodePassword(efUser.Password);
+                }
+
+                dbUser.RealName = efUser.RealName;
+                dbUser.Email = efUser.Email;
+                dbUser.TelNumber = efUser.TelNumber;
+                dbUser.Comment = efUser.Comment;
+                dbUser.IsApproved = efUser.IsApproved;
+
+                db.SaveChanges();
             }
         }
 
@@ -472,20 +430,15 @@ namespace GHY.EF.Security
         public override bool ValidateUser(string userName, string password)
         {
             Contract.Requires(!string.IsNullOrWhiteSpace(userName));
+            Contract.Requires(!string.IsNullOrWhiteSpace(password));
 
-            IDataParameter[] parameters = new IDataParameter[3];
-            parameters[0] = this.db.NewDataParameter("@UserName", userName);
-            parameters[1] = this.db.NewDataParameter("@Password", this.EncodePassword(password));
-            parameters[2] = this.db.NewDataParameter("@ApplicationName", this.ApplicationName);
-
-            int result = this.db.ExecuteNonQuery(CommandType.StoredProcedure, "EF_Membership_Validate", parameters);
-
-            if (result == 0)
+            using (var db = this.getDBContext())
             {
-                return false;
-            }
+                var user = db.Users.First(u =>
+                    u.UserName == userName && u.Password == password && u.ApplicationName == this.ApplicationName && u.IsApproved == true);
 
-            return true;
+                return user != null;
+            }
         }
         #endregion
     }

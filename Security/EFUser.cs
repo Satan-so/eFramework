@@ -11,7 +11,12 @@ namespace GHY.EF.Security
         /// <summary>
         /// 获取或设置用户唯一标识符。
         /// </summary>
-        public int UserId { get; set; }
+        public int Id { get; set; }
+
+        /// <summary>
+        /// 获取或设置用户名。
+        /// </summary>
+        public new string UserName { get; set; }
 
         /// <summary>
         /// 获取或设置用户密码。仅在管理员设置密码时使用。
@@ -29,23 +34,8 @@ namespace GHY.EF.Security
         public string TelNumber { get; set; }
 
         /// <summary>
-        /// 构造函数。
+        /// 所属应用程序的名称。
         /// </summary>
-        /// <param name="providerName"></param>
-        /// <param name="userName"></param>
-        /// <param name="providerUserKey"></param>
-        /// <param name="email"></param>
-        /// <param name="passwordQuestion"></param>
-        /// <param name="comment"></param>
-        /// <param name="isApproved"></param>
-        /// <param name="isLockedOut"></param>
-        /// <param name="creationDate"></param>
-        /// <param name="lastLoginDate"></param>
-        /// <param name="lastActivityDate"></param>
-        /// <param name="lastPasswordChangedDate"></param>
-        /// <param name="lastLockedOutDate"></param>
-        public EFUser(string providerName, string userName, Object providerUserKey, string email, string passwordQuestion, string comment, bool isApproved, bool isLockedOut, DateTime creationDate, DateTime lastLoginDate, DateTime lastActivityDate, DateTime lastPasswordChangedDate, DateTime lastLockedOutDate)
-            : base(providerName, userName, providerUserKey, email, passwordQuestion, comment, isApproved, isLockedOut, creationDate, lastLoginDate, lastActivityDate, lastPasswordChangedDate, lastLockedOutDate)
-        { }
+        public string ApplicationName { get; set; }
     }
 }
