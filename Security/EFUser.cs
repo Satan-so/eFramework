@@ -1,5 +1,4 @@
-﻿using System;
-using System.Web.Security;
+﻿using System.Web.Security;
 
 namespace GHY.EF.Security
 {
@@ -32,10 +31,5 @@ namespace GHY.EF.Security
         /// 获取或设置电话号码。
         /// </summary>
         public string TelNumber { get; set; }
-
-        /// <summary>
-        /// 所属应用程序的名称。
-        /// </summary>
-        public string ApplicationName { get; set; }
     }
 }

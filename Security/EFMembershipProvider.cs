@@ -124,16 +124,16 @@ namespace GHY.EF.Security
             Contract.Requires(!string.IsNullOrWhiteSpace(oldPassword));
             Contract.Requires(!string.IsNullOrWhiteSpace(newPassword));
 
-            if (!this.ValidateUser(userName, oldPassword))
-            {
-                return false;
-            }
-
             using (var db = this.getDBContext())
             {
-                var dbUser = db.Users.Single(u => u.UserName == userName && u.ApplicationName == this.ApplicationName);
+                var user = db.Users.First(u => u.UserName == userName && u.Password == oldPassword && u.IsApproved == true);
 
-                dbUser.Password = this.EncodePassword(newPassword);
+                if (user == null)
+                {
+                    return false;
+                }
+
+                user.Password = this.EncodePassword(newPassword);
                 db.SaveChanges();
             }
 
@@ -171,27 +171,30 @@ namespace GHY.EF.Security
             Contract.Requires(!string.IsNullOrWhiteSpace(userName));
             Contract.Requires(!string.IsNullOrWhiteSpace(password));
 
-            if (this.GetUser(userName, false) != null)
-            {
-                status = MembershipCreateStatus.DuplicateUserName;
-                return null;
-            }
-
             using (var db = this.getDBContext())
             {
-                var user = new EFUser();
-                user.UserName = userName;
-                user.Password = this.EncodePassword(password);
-                user.Email = email;
-                user.IsApproved = isApproved;
-                user.ApplicationName = this.ApplicationName;
+                var user = db.Users.First(u => u.UserName == userName);
+
+                if (user != null)
+                {
+                    status = MembershipCreateStatus.DuplicateUserName;
+                    return user;
+                }
+
+                user = new EFUser()
+                {
+                    UserName = userName,
+                    Password = this.EncodePassword(password),
+                    Email = email,
+                    IsApproved = isApproved
+                };
                 db.Users.Add(user);
 
                 db.SaveChanges();
-            }
 
-            status = MembershipCreateStatus.Success;
-            return this.GetUser(userName, false);
+                status = MembershipCreateStatus.Success;
+                return db.Users.First(u => u.UserName == userName);
+            }
         }
 
         /// <summary>
@@ -218,7 +221,7 @@ namespace GHY.EF.Security
         public override MembershipUserCollection FindUsersByEmail(string emailToMatch, int pageIndex, int pageSize, out int totalRecords)
         {
             totalRecords = 0;
-            return new MembershipUserCollection();
+            return null;
         }
 
         /// <summary>
@@ -237,10 +240,8 @@ namespace GHY.EF.Security
 
             using (var db = this.getDBContext())
             {
-                totalRecords = db.Users.Count(u => u.ApplicationName == this.ApplicationName
-                    && (u.UserName.Contains(userNameToMatch) || u.RealName.Contains(userNameToMatch)));
-                var dbUsers = db.Users.Where(u => u.ApplicationName == this.ApplicationName
-                    && (u.UserName.Contains(userNameToMatch) || u.RealName.Contains(userNameToMatch)))
+                totalRecords = db.Users.Count(u => u.UserName.Contains(userNameToMatch) || u.RealName.Contains(userNameToMatch));
+                var dbUsers = db.Users.Where(u => u.UserName.Contains(userNameToMatch) || u.RealName.Contains(userNameToMatch))
                     .OrderByDescending(u => u.Id).Skip((pageIndex - 1) * pageSize).Take(pageSize);
 
                 var users = new MembershipUserCollection();
@@ -268,9 +269,8 @@ namespace GHY.EF.Security
 
             using (var db = this.getDBContext())
             {
-                totalRecords = db.Users.Count(u => u.ApplicationName == this.ApplicationName);
-                var dbUsers = db.Users.Where(u => u.ApplicationName == this.ApplicationName)
-                    .OrderByDescending(u => u.Id).Skip((pageIndex - 1) * pageSize).Take(pageSize);
+                totalRecords = db.Users.Count();
+                var dbUsers = db.Users.OrderByDescending(u => u.Id).Skip((pageIndex - 1) * pageSize).Take(pageSize);
 
                 MembershipUserCollection users = new MembershipUserCollection();
 
@@ -317,8 +317,7 @@ namespace GHY.EF.Security
 
             using (var db = this.getDBContext())
             {
-                return db.Users.First(u =>
-                    u.UserName == userName && u.ApplicationName == this.ApplicationName && u.IsApproved == true);
+                return db.Users.First(u => u.UserName == userName && u.IsApproved == true);
             }
         }
 
@@ -404,7 +403,7 @@ namespace GHY.EF.Security
 
             using (var db = this.getDBContext())
             {
-                var dbUser = db.Users.Single(u => u.Id == efUser.Id && u.ApplicationName == this.ApplicationName);
+                var dbUser = db.Users.Single(u => u.Id == efUser.Id);
 
                 if (!string.IsNullOrWhiteSpace(efUser.Password))
                 {
@@ -434,8 +433,7 @@ namespace GHY.EF.Security
 
             using (var db = this.getDBContext())
             {
-                var user = db.Users.First(u =>
-                    u.UserName == userName && u.Password == password && u.ApplicationName == this.ApplicationName && u.IsApproved == true);
+                var user = db.Users.First(u => u.UserName == userName && u.Password == password && u.IsApproved == true);
 
                 return user != null;
             }

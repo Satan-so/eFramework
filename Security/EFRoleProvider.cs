@@ -1,9 +1,8 @@
 ﻿using System.Collections.Specialized;
-using System.Data;
 using System.Diagnostics.Contracts;
+using System.Linq;
 using System.Web.Hosting;
 using System.Web.Security;
-using GHY.EF.Core.Data;
 
 namespace GHY.EF.Security
 {
@@ -13,7 +12,14 @@ namespace GHY.EF.Security
     public class EFRoleProvider : RoleProvider
     {
         #region 私有字段
-        Database db;
+        string connStrName;
+        #endregion
+
+        #region 私有方法
+        SecurityEntities getDBContext()
+        {
+            return new SecurityEntities(this.connStrName);
+        }
         #endregion
 
         #region 公共属性
@@ -32,23 +38,31 @@ namespace GHY.EF.Security
         /// <param name="roleNames">一个字符串数组，其中包含要将指定用户名添加到的角色的名称。</param>
         public override void AddUsersToRoles(string[] userNames, string[] roleNames)
         {
-            foreach (string userName in userNames)
+            Contract.Requires(userNames.Length > 0);
+            Contract.Requires(roleNames.Length > 0);
+
+            using (var db = this.getDBContext())
             {
-                foreach (string roleName in roleNames)
+                foreach (string userName in userNames)
                 {
-                    if (IsUserInRole(userName, roleName))
+                    foreach (string roleName in roleNames)
                     {
-                        return;
+                        if (db.UserInRoles.First(ur => ur.UserName == userName && ur.RoleName == roleName) != null)
+                        {
+                            break;
+                        }
+
+                        var userInRole = new EFUserInRole()
+                        {
+                            UserName = userName,
+                            RoleName = roleName
+                        };
+
+                        db.UserInRoles.Add(userInRole);
                     }
-
-                    IDataParameter[] parameters = new IDataParameter[3];
-
-                    parameters[0] = this.db.NewDataParameter("@UserName", userName);
-                    parameters[1] = this.db.NewDataParameter("@RoleName", roleName);
-                    parameters[2] = this.db.NewDataParameter("@ApplicationName", this.ApplicationName);
-
-                    this.db.ExecuteNonQuery(CommandType.StoredProcedure, "EF_UsersInRoles_Add", parameters);
                 }
+
+                db.SaveChanges();
             }
         }
 
@@ -60,17 +74,23 @@ namespace GHY.EF.Security
         {
             Contract.Requires(!string.IsNullOrWhiteSpace(roleName));
 
-            if (this.RoleExists(roleName))
+            using (var db = this.getDBContext())
             {
-                return;
+                var role = db.Roles.First(r => r.RoleName == roleName);
+
+                if (role != null)
+                {
+                    return;
+                }
+
+                role = new EFRole()
+                {
+                    RoleName = roleName
+                };
+                db.Roles.Add(role);
+
+                db.SaveChanges();
             }
-
-            IDataParameter[] parameters = new IDataParameter[2];
-
-            parameters[0] = this.db.NewDataParameter("@RoleName", roleName);
-            parameters[1] = this.db.NewDataParameter("@ApplicationName", this.ApplicationName);
-
-            this.db.ExecuteNonQuery(CommandType.StoredProcedure, "EF_Role_Add", parameters);
         }
 
         /// <summary>
@@ -81,27 +101,22 @@ namespace GHY.EF.Security
         /// <returns>如果成功删除角色，则为 true；否则为 false。</returns>
         public override bool DeleteRole(string roleName, bool throwOnPopulatedRole)
         {
+            Contract.Requires(!string.IsNullOrWhiteSpace(roleName));
             throwOnPopulatedRole = true;
 
-            if (throwOnPopulatedRole && this.GetUsersInRole(roleName).Length > 0)
+            using (var db = this.getDBContext())
             {
-                return false;
+                if (throwOnPopulatedRole && db.UserInRoles.Count(ur => ur.RoleName == roleName) > 0)
+                {
+                    return false;
+                }
+
+                var role = db.Roles.Single(r => r.RoleName == roleName);
+                db.Roles.Remove(role);
+
+                db.SaveChanges();
+                return true;
             }
-
-            IDataParameter[] parameters = new IDataParameter[2];
-
-            parameters[0] = this.db.NewDataParameter("@RoleName", roleName);
-            parameters[1] = this.db.NewDataParameter("@ApplicationName", this.ApplicationName);
-
-            int result = this.db.ExecuteNonQuery(CommandType.StoredProcedure, "EF_Role_Delete", parameters);
-
-            if (result == 0)
-            {
-                return false;
-            }
-
-            return true;
-
         }
 
         /// <summary>
@@ -122,24 +137,18 @@ namespace GHY.EF.Security
         /// <returns>一个字符串数组，包含在数据源中存储的已配置的 applicationName 的所有角色的名称。</returns>
         public override string[] GetAllRoles()
         {
-            IDataParameter[] parameters = new IDataParameter[1];
-
-            parameters[0] = this.db.NewDataParameter("@ApplicationName", this.ApplicationName);
-
-            StringCollection rolesCollection = new StringCollection();
-
-            using (IDataReader reader = this.db.ExcuteReader(CommandType.StoredProcedure, "EF_Roles_GetAll", parameters))
+            using (var db = this.getDBContext())
             {
-                while (reader.Read())
+                var dbRoles = db.Roles.OrderByDescending(r => r.Id);
+                string[] roles = new string[dbRoles.Count()];
+
+                for (int i = 0; i < roles.Length; i++)
                 {
-                    rolesCollection.Add(reader["RoleName"].ToString());
+                    roles[i] = dbRoles.ElementAt(i).RoleName;
                 }
+
+                return roles;
             }
-
-            string[] roles = new string[rolesCollection.Count];
-            rolesCollection.CopyTo(roles, 0);
-
-            return roles;
         }
 
         /// <summary>
@@ -151,25 +160,18 @@ namespace GHY.EF.Security
         {
             Contract.Requires(!string.IsNullOrWhiteSpace(userName));
 
-            IDataParameter[] parameters = new IDataParameter[2];
-
-            parameters[1] = this.db.NewDataParameter("@UserName", userName);
-            parameters[0] = this.db.NewDataParameter("@ApplicationName", this.ApplicationName);
-
-            StringCollection rolesCollection = new StringCollection();
-
-            using (IDataReader reader = this.db.ExcuteReader(CommandType.StoredProcedure, "EF_UsersInRoles_GetRoles", parameters))
+            using (var db = this.getDBContext())
             {
-                while (reader.Read())
+                var dbRoles = db.UserInRoles.Where(ur => ur.UserName == userName);
+                string[] roles = new string[dbRoles.Count()];
+
+                for (int i = 0; i < roles.Length; i++)
                 {
-                    rolesCollection.Add(reader["RoleName"].ToString());
+                    roles[i] = dbRoles.ElementAt(i).RoleName;
                 }
+
+                return roles;
             }
-
-            string[] roles = new string[rolesCollection.Count];
-            rolesCollection.CopyTo(roles, 0);
-
-            return roles;
         }
 
         /// <summary>
@@ -181,25 +183,18 @@ namespace GHY.EF.Security
         {
             Contract.Requires(!string.IsNullOrWhiteSpace(roleName));
 
-            IDataParameter[] parameters = new IDataParameter[2];
-
-            parameters[1] = this.db.NewDataParameter("@RoleName", roleName);
-            parameters[0] = this.db.NewDataParameter("@ApplicationName", this.ApplicationName);
-
-            StringCollection usersCollection = new StringCollection();
-
-            using (IDataReader reader = this.db.ExcuteReader(CommandType.StoredProcedure, "EF_UsersInRoles_GetUsers", parameters))
+            using (var db = this.getDBContext())
             {
-                while (reader.Read())
+                var dbUsers = db.UserInRoles.Where(ur => ur.RoleName == roleName);
+                string[] users = new string[dbUsers.Count()];
+
+                for (int i = 0; i < users.Length; i++)
                 {
-                    usersCollection.Add(reader["UserName"].ToString());
+                    users[i] = dbUsers.ElementAt(i).UserName;
                 }
+
+                return users;
             }
-
-            string[] users = new string[usersCollection.Count];
-            usersCollection.CopyTo(users, 0);
-
-            return users;
         }
 
         /// <summary>
@@ -223,7 +218,7 @@ namespace GHY.EF.Security
             base.Initialize(name, config);
             this.ApplicationName = string.IsNullOrEmpty(config["applicationName"]) ? HostingEnvironment.ApplicationVirtualPath : config["applicationName"];
 
-            this.db = new Database(config["connectionStringName"]);
+            this.connStrName = config["connectionStringName"];
         }
 
         /// <summary>
@@ -237,20 +232,10 @@ namespace GHY.EF.Security
             Contract.Requires(!string.IsNullOrWhiteSpace(userName));
             Contract.Requires(!string.IsNullOrWhiteSpace(roleName));
 
-            IDataParameter[] parameters = new IDataParameter[3];
-
-            parameters[0] = this.db.NewDataParameter("@UserName", userName);
-            parameters[1] = this.db.NewDataParameter("@RoleName", roleName);
-            parameters[2] = this.db.NewDataParameter("@ApplicationName", this.ApplicationName);
-
-            int result = (int)this.db.ExecuteScalar(CommandType.StoredProcedure, "EF_UsersInRoles_Exists", parameters);
-
-            if (result > 0)
+            using (var db = this.getDBContext())
             {
-                return true;
+                return db.UserInRoles.First(ur => ur.UserName == userName && ur.RoleName == roleName) != null;
             }
-
-            return false;
         }
 
         /// <summary>
@@ -261,18 +246,25 @@ namespace GHY.EF.Security
         /// <param name="roleNames">一个字符串数组，其中包含要将指定用户名从中移除的角色的名称。</param>
         public override void RemoveUsersFromRoles(string[] userNames, string[] roleNames)
         {
-            foreach (string userName in userNames)
+            Contract.Requires(userNames.Length > 0);
+            Contract.Requires(roleNames.Length > 0);
+
+            using (var db = this.getDBContext())
             {
-                foreach (string roleName in roleNames)
+                foreach (string userName in userNames)
                 {
-                    IDataParameter[] parameters = new IDataParameter[3];
+                    foreach (string roleName in roleNames)
+                    {
+                        var userInRole = db.UserInRoles.First(ur => ur.UserName == userName && ur.RoleName == roleName);
 
-                    parameters[0] = this.db.NewDataParameter("@UserName", userName);
-                    parameters[1] = this.db.NewDataParameter("@RoleName", roleName);
-                    parameters[2] = this.db.NewDataParameter("@ApplicationName", this.ApplicationName);
-
-                    this.db.ExecuteNonQuery(CommandType.StoredProcedure, "EF_UsersInRoles_Delete", parameters);
+                        if (userInRole != null)
+                        {
+                            db.UserInRoles.Remove(userInRole);
+                        }
+                    }
                 }
+
+                db.SaveChanges();
             }
         }
 
@@ -285,20 +277,10 @@ namespace GHY.EF.Security
         {
             Contract.Requires(!string.IsNullOrWhiteSpace(roleName));
 
-            IDataParameter[] parameters = new IDataParameter[2];
-
-            parameters[0] = this.db.NewDataParameter("@RoleName", roleName);
-            parameters[1] = this.db.NewDataParameter("@ApplicationName", this.ApplicationName);
-
-            int result = (int)this.db.ExecuteScalar(CommandType.StoredProcedure, "EF_Role_Exists", parameters);
-
-            if (result > 0)
+            using (var db = this.getDBContext())
             {
-                return true;
+                return db.Roles.First(r => r.RoleName == roleName) != null;
             }
-
-            return false;
-
         }
         #endregion
     }
