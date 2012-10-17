@@ -1,4 +1,5 @@
-﻿using System.Collections.Specialized;
+﻿using System;
+using System.Collections.Specialized;
 using System.Diagnostics.Contracts;
 using System.Linq;
 using System.Security.Cryptography;
@@ -123,17 +124,19 @@ namespace GHY.EF.Security
             Contract.Requires(!string.IsNullOrWhiteSpace(userName));
             Contract.Requires(!string.IsNullOrWhiteSpace(oldPassword));
             Contract.Requires(!string.IsNullOrWhiteSpace(newPassword));
-
-            if (!this.ValidateUser(userName, oldPassword))
-            {
-                return false;
-            }
+            string encodePassword = this.EncodePassword(oldPassword);
 
             using (var db = this.getDBContext())
             {
-                var dbUser = db.Users.Single(u => u.UserName == userName && u.ApplicationName == this.ApplicationName);
+                var user = db.Users.SingleOrDefault(u => u.UserName == userName && u.Password == encodePassword && u.IsApproved == true);
 
-                dbUser.Password = this.EncodePassword(newPassword);
+                if (user == null)
+                {
+                    return false;
+                }
+
+                user.Password = this.EncodePassword(newPassword);
+                user.LastPasswordChangedDate = DateTime.Now;
                 db.SaveChanges();
             }
 
@@ -171,27 +174,33 @@ namespace GHY.EF.Security
             Contract.Requires(!string.IsNullOrWhiteSpace(userName));
             Contract.Requires(!string.IsNullOrWhiteSpace(password));
 
-            if (this.GetUser(userName, false) != null)
-            {
-                status = MembershipCreateStatus.DuplicateUserName;
-                return null;
-            }
-
             using (var db = this.getDBContext())
             {
-                var user = new EFUser();
-                user.UserName = userName;
-                user.Password = this.EncodePassword(password);
-                user.Email = email;
-                user.IsApproved = isApproved;
-                user.ApplicationName = this.ApplicationName;
+                var user = db.Users.SingleOrDefault(u => u.UserName == userName);
+
+                if (user != null)
+                {
+                    status = MembershipCreateStatus.DuplicateUserName;
+                    return new EFUser(user);
+                }
+
+                user = new EFUserPoco()
+                {
+                    UserName = userName,
+                    Password = this.EncodePassword(password),
+                    Email = email,
+                    IsApproved = isApproved,
+                    CreationDate = DateTime.Now,
+                    LastLoginDate = DateTime.Now,
+                    LastPasswordChangedDate = DateTime.Now
+                };
                 db.Users.Add(user);
 
                 db.SaveChanges();
-            }
 
-            status = MembershipCreateStatus.Success;
-            return this.GetUser(userName, false);
+                status = MembershipCreateStatus.Success;
+                return new EFUser(user);
+            }
         }
 
         /// <summary>
@@ -218,7 +227,7 @@ namespace GHY.EF.Security
         public override MembershipUserCollection FindUsersByEmail(string emailToMatch, int pageIndex, int pageSize, out int totalRecords)
         {
             totalRecords = 0;
-            return new MembershipUserCollection();
+            return null;
         }
 
         /// <summary>
@@ -237,17 +246,15 @@ namespace GHY.EF.Security
 
             using (var db = this.getDBContext())
             {
-                totalRecords = db.Users.Count(u => u.ApplicationName == this.ApplicationName
-                    && (u.UserName.Contains(userNameToMatch) || u.RealName.Contains(userNameToMatch)));
-                var dbUsers = db.Users.Where(u => u.ApplicationName == this.ApplicationName
-                    && (u.UserName.Contains(userNameToMatch) || u.RealName.Contains(userNameToMatch)))
+                totalRecords = db.Users.Count(u => u.UserName.Contains(userNameToMatch) || u.RealName.Contains(userNameToMatch));
+                var dbUsers = db.Users.Where(u => u.UserName.Contains(userNameToMatch) || u.RealName.Contains(userNameToMatch))
                     .OrderByDescending(u => u.Id).Skip((pageIndex - 1) * pageSize).Take(pageSize);
 
                 var users = new MembershipUserCollection();
 
                 foreach (var user in dbUsers)
                 {
-                    users.Add(user);
+                    users.Add(new EFUser(user));
                 }
 
                 return users;
@@ -268,15 +275,14 @@ namespace GHY.EF.Security
 
             using (var db = this.getDBContext())
             {
-                totalRecords = db.Users.Count(u => u.ApplicationName == this.ApplicationName);
-                var dbUsers = db.Users.Where(u => u.ApplicationName == this.ApplicationName)
-                    .OrderByDescending(u => u.Id).Skip((pageIndex - 1) * pageSize).Take(pageSize);
+                totalRecords = db.Users.Count();
+                var dbUsers = db.Users.OrderByDescending(u => u.Id).Skip((pageIndex - 1) * pageSize).Take(pageSize);
 
-                MembershipUserCollection users = new MembershipUserCollection();
+                var users = new MembershipUserCollection();
 
                 foreach (var user in dbUsers)
                 {
-                    users.Add(user);
+                    users.Add(new EFUser(user));
                 }
 
                 return users;
@@ -306,10 +312,10 @@ namespace GHY.EF.Security
         }
 
         /// <summary>
-        /// 从数据源获取用户的信息。提供一个更新用户最近一次活动的日期/时间戳的选项。
+        /// 从数据源获取用户的信息。
         /// </summary>
         /// <param name="userName">要获取其信息的用户名。</param>
-        /// <param name="userIsOnline">该参数暂不支持。如果为 true，则更新用户最近一次活动的日期/时间戳；如果为 false，则返回用户信息，但不更新用户最近一次活动的日期/时间戳。</param>
+        /// <param name="userIsOnline">该参数暂不支持。</param>
         /// <returns>用数据源中指定用户的信息填充的 MembershipUser 对象。</returns>
         public override MembershipUser GetUser(string userName, bool userIsOnline)
         {
@@ -317,21 +323,26 @@ namespace GHY.EF.Security
 
             using (var db = this.getDBContext())
             {
-                return db.Users.First(u =>
-                    u.UserName == userName && u.ApplicationName == this.ApplicationName && u.IsApproved == true);
+                return new EFUser(db.Users.SingleOrDefault(u => u.UserName == userName));
             }
         }
 
         /// <summary>
-        /// 根据成员资格用户的唯一标识符从数据源获取用户信息。提供一个更新用户最近一次活动的日期/时间戳的选项。
-        /// 暂不支持该方法。
+        /// 根据成员资格用户的唯一标识符从数据源获取用户信息。
         /// </summary>
-        /// <param name="providerUserKey"></param>
-        /// <param name="userIsOnline"></param>
-        /// <returns></returns>
+        /// <param name="providerUserKey">要获取其信息的成员资格用户的唯一标识符。</param>
+        /// <param name="userIsOnline">该参数暂不支持。</param>
+        /// <returns>用数据源中指定用户的信息填充的 MembershipUser 对象。</returns>
         public override MembershipUser GetUser(object providerUserKey, bool userIsOnline)
         {
-            return null;
+            Contract.Requires(providerUserKey != null);
+            int id = (int)providerUserKey;
+            Contract.Requires(id > 0);
+
+            using (var db = this.getDBContext())
+            {
+                return new EFUser(db.Users.Find(id));
+            }
         }
 
         /// <summary>
@@ -398,24 +409,31 @@ namespace GHY.EF.Security
         public override void UpdateUser(MembershipUser user)
         {
             Contract.Requires(user != null);
+            Contract.Requires(user is EFUser);
 
             var efUser = user as EFUser;
-            Contract.Requires(efUser.Id > 0);
+            var poco = efUser.ToPoco();
+            Contract.Requires(poco.Id > 0);
 
             using (var db = this.getDBContext())
             {
-                var dbUser = db.Users.Single(u => u.Id == efUser.Id && u.ApplicationName == this.ApplicationName);
+                var dbUser = db.Users.Find(poco.Id);
 
-                if (!string.IsNullOrWhiteSpace(efUser.Password))
+                if (dbUser == null)
                 {
-                    dbUser.Password = this.EncodePassword(efUser.Password);
+                    return;
                 }
 
-                dbUser.RealName = efUser.RealName;
-                dbUser.Email = efUser.Email;
-                dbUser.TelNumber = efUser.TelNumber;
-                dbUser.Comment = efUser.Comment;
-                dbUser.IsApproved = efUser.IsApproved;
+                if (!string.IsNullOrWhiteSpace(poco.Password))
+                {
+                    dbUser.Password = this.EncodePassword(poco.Password);
+                }
+
+                dbUser.RealName = poco.RealName;
+                dbUser.Email = poco.Email;
+                dbUser.TelNumber = poco.TelNumber;
+                dbUser.Comment = poco.Comment;
+                dbUser.IsApproved = poco.IsApproved;
 
                 db.SaveChanges();
             }
@@ -431,13 +449,22 @@ namespace GHY.EF.Security
         {
             Contract.Requires(!string.IsNullOrWhiteSpace(userName));
             Contract.Requires(!string.IsNullOrWhiteSpace(password));
+            string encodePassword = this.EncodePassword(password);
 
             using (var db = this.getDBContext())
             {
-                var user = db.Users.First(u =>
-                    u.UserName == userName && u.Password == password && u.ApplicationName == this.ApplicationName && u.IsApproved == true);
+                var user = db.Users.SingleOrDefault(
+                    u => u.UserName == userName && u.Password == encodePassword && u.IsApproved == true);
 
-                return user != null;
+                if (user != null)
+                {
+                    user.LastLoginDate = DateTime.Now;
+                    db.SaveChanges();
+
+                    return true;
+                }
+
+                return false;
             }
         }
         #endregion
