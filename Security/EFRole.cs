@@ -3,18 +3,18 @@ using System.ComponentModel.DataAnnotations;
 namespace GHY.EF.Security
 {
     /// <summary>
-    /// EF½ÇÉ«¡£
+    /// EFè§’è‰²ã€‚
     /// </summary>
     [Table("EF_Roles")]
     public class EFRole
     {
         /// <summary>
-        /// »ñÈ¡»òÉèÖÃ½ÇÉ«Id¡£
+        /// è·å–æˆ–è®¾ç½®è§’è‰²Idã€‚
         /// </summary>
         public int Id { get; set; }
 
         /// <summary>
-        /// »ñÈ¡»òÉèÖÃ½ÇÉ«Ãû¡£
+        /// è·å–æˆ–è®¾ç½®è§’è‰²åã€‚
         /// </summary>
         public string RoleName { get; set; }
     }
