@@ -1,20 +1,38 @@
-ï»¿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations;
 
 namespace GHY.EF.Security
 {
     /// <summary>
-    /// EFè§’è‰²ã€‚
+    /// EF½ÇÉ«¡£
     /// </summary>
     [Table("EF_Roles")]
     public class EFRole
     {
         /// <summary>
-        /// è·å–æˆ–è®¾ç½®è§’è‰²Idã€‚
+        /// »ñÈ¡»òÉèÖÃ½ÇÉ«Id¡£
         /// </summary>
         public int Id { get; set; }
 
         /// <summary>
-        /// è·å–æˆ–è®¾ç½®è§’è‰²åã€‚
+        /// »ñÈ¡»òÉèÖÃ½ÇÉ«Ãû¡£
+        /// </summary>
+        public string RoleName { get; set; }
+    }
+}
+namespace GHY.EF.Security
+{
+    /// <summary>
+    /// EF½ÇÉ«¡£
+    /// </summary>
+    public class EFRole
+    {
+        /// <summary>
+        /// »ñÈ¡»òÉèÖÃ½ÇÉ«Id¡£
+        /// </summary>
+        public int Id { get; set; }
+
+        /// <summary>
+        /// »ñÈ¡»òÉèÖÃ½ÇÉ«Ãû¡£
         /// </summary>
         public string RoleName { get; set; }
     }
